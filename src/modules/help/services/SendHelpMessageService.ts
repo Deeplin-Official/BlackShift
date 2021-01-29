@@ -1,6 +1,6 @@
 import { Message } from 'discord.js';
 
-export default class PingCommand {
+export default class SendHelpMessageService {
   execute(message: Message): void {
     message.reply(`Command List: \n - ping \n - hello \n - help`);
   }

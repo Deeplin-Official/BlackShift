@@ -1,6 +1,10 @@
+import 'reflect-metadata';
 import 'dotenv/config';
 
 import { Client as DiscordClient, Message } from 'discord.js';
+import { container } from 'tsyringe';
+
+import RunCommands from '../commands';
 
 export default class App {
   discordClient: DiscordClient;
@@ -10,23 +14,26 @@ export default class App {
   constructor() {
     this.discordClient = new DiscordClient();
     this.prefix = '!';
-    this.runCommands();
+    this.ListenCommands();
   }
 
-  async runCommands(): Promise<void> {
-    this.discordClient.on('message', async (data: Message) => {
-      if (data.author.bot) return;
+  private async ListenCommands(): Promise<void> {
+    const runCommands = container.resolve(RunCommands);
 
-      if (data.content.substr(0, 1) !== this.prefix) return;
+    this.discordClient.on('message', async (message: Message) => {
+      if (message.author.bot || message.content.substr(0, 1) !== this.prefix)
+        return;
 
-      const commandBody = data.content.slice(this.prefix.length);
+      const commandBody = message.content.slice(this.prefix.length);
       const args = commandBody.split(' ');
 
       const command = args.shift()?.toLowerCase();
 
       if (command !== 'ctos') return;
 
-      // Implement commands here!
+      if (command?.toLocaleLowerCase() === 'ctos') {
+        runCommands.execute({ command: args[0], message });
+      }
     });
   }
 
