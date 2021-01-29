@@ -1,0 +1,28 @@
+{
+  "name": "ctos",
+  "description": "Mannagement discord bot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "tsnd --inspect --transpile-only --ignore-watch node_module src/shared/infra/http/server.ts"
+  },
+  "dependencies": {
+    "discord.js": "^12.5.1",
+    "typescript": "^4.1.3",
+    "dotenv": "^8.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.19",
+    "@typescript-eslint/eslint-plugin": "^4.8.2",
+    "@typescript-eslint/parser": "^4.8.2",
+    "eslint": "6.8.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-import-resolver-typescript": "^2.3.0",
+    "eslint-plugin-import": "^2.21.2",
+    "eslint-plugin-prettier": "^3.1.4",
+    "prettier": "^2.2.0",
+    "ts-node-dev": "^1.1.1"
+  }
+}
