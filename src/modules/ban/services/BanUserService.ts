@@ -24,7 +24,7 @@ export default class BanUserService {
 
     await this.ormRepository.destroy(bannedUser);
 
-    message.reply(
+    message.channel.send(
       `${member.user.username} was banned of this server for 1 day`,
     );
   }

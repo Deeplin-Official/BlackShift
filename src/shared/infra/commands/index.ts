@@ -34,7 +34,7 @@ export default class RunCommands {
         break;
 
       default:
-        message.reply(
+        message.channel.send(
           "Oooh, i can't understand that command please do 'help' to list all existent commands",
         );
         break;
