@@ -6,5 +6,5 @@ module.exports = {
   host: 'localhost',
   port: process.env.MONGO_PORT,
   useUnifiedTopology: true,
-  entities: ['./dist/modules/**/infra/typeorm/schemas/*.ts'],
+  entities: ['./dist/modules/**/infra/typeorm/schemas/*.js'],
 };
