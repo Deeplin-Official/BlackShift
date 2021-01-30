@@ -21,16 +21,6 @@ interface IRemoveStaffRequest {
   staff_id: string;
 }
 
-/**
- * Todos
- *
- * [x] Somente um Staff pode rodar esse comando
- * [x] Verificar se o usuário ja existe no banco de dados
- * [x] Criar um staff no banco de dados se ele não existir
- * [] Remover um staff no banco de dados somente se ele existir
- *
- */
-
 export default class SendStaffUserMessageService {
   async execute({ message, method }: IRequest): Promise<void> {
     try {
