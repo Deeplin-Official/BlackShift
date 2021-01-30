@@ -1,49 +1,41 @@
 import { container } from 'tsyringe';
 import { Message } from 'discord.js';
 
-import discorApi from '@shared/infra/http/services/ApiService';
+import Ban from '../infra/typeorm/schemas/Ban';
 
 import CreateBannedUserService from './CreateBannedUserService';
 import UpdateBannedUserService from './UpdateBannedUserService';
 import GetBannedUserService from './GetBannedUserService';
-
-import Ban from '../infra/typeorm/schemas/Ban';
-import IDiscordUserDTO from '../dtos/IDiscordUserDTO';
+import BanUserService from './BanUserService';
 
 export default class SendBanMessageService {
-  async execute(message: Message, votedUser: string): Promise<Ban | Message> {
+  async execute(message: Message): Promise<Ban | Message> {
     const createBannedUser = container.resolve(CreateBannedUserService);
     const updateBannedUser = container.resolve(UpdateBannedUserService);
     const getBannedUser = container.resolve(GetBannedUserService);
+    const banUser = container.resolve(BanUserService);
 
-    const checkValidvotedUser = !!votedUser.includes('@');
-    const votedUserId = votedUser
-      .replace('<', '')
-      .replace('>', '')
-      .replace('!', '')
-      .replace('@', '');
+    const { author, mentions } = message;
 
-    const { author } = message;
+    const target = mentions.users.first();
+
+    if (!target) {
+      throw new Error();
+    }
 
     try {
-      const checkYourselfBan = author.id === votedUserId;
-
-      if (!checkValidvotedUser) throw new Error();
+      const checkYourselfBan = author.id === target.id;
 
       if (checkYourselfBan) {
-        return message.reply('Cannot ban yourself');
+        return message.channel.send('Cannot ban yourself');
       }
 
-      const { data: discordVotedUser } = await discorApi.get<IDiscordUserDTO>(
-        `users/${votedUserId}`,
-      );
-
-      if (discordVotedUser.bot) return message.reply('Cannot ban a bot');
+      if (target.bot) return message.channel.send('Cannot ban a bot');
 
       const bannedUserData = await getBannedUser.execute({
-        id: discordVotedUser.id,
-        username: discordVotedUser.username,
-        avatar: discordVotedUser.avatar,
+        id: target.id,
+        username: target.username,
+        avatar: target.avatar,
       });
 
       if (bannedUserData) {
@@ -52,11 +44,19 @@ export default class SendBanMessageService {
         );
 
         if (checkAlreadyVoted)
-          return message.reply('Cannot request a ban many times');
+          return message.channel.send('Cannot request a ban many times');
+
+        if (bannedUserData.banCounts === 10) {
+          await banUser.execute({
+            member: message.guild?.members.cache.get(target.id),
+            bannedUser: bannedUserData,
+            message,
+          });
+        }
 
         const updatedBannedUser = updateBannedUser.execute({
           bannedUserData,
-          whoVotedUser: discordVotedUser,
+          whoVotedUser: target,
         });
 
         return updatedBannedUser;
@@ -64,9 +64,9 @@ export default class SendBanMessageService {
 
       await createBannedUser.execute({
         votedUser: {
-          id: discordVotedUser.id,
-          username: discordVotedUser.username,
-          avatar: discordVotedUser.avatar || null,
+          id: target.id,
+          username: target.username,
+          avatar: target.avatar || null,
         },
         whoVote: {
           id: author.id,
@@ -75,9 +75,11 @@ export default class SendBanMessageService {
         },
       });
 
-      return message.reply(`Thanks for voting 📢️`);
+      return message.channel.send(`Thanks for voting 📢️`);
     } catch (error) {
-      return message.reply('Please inform a valid user');
+      console.log(error);
+
+      return message.channel.send('Please inform a valid user');
     }
   }
 }

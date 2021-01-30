@@ -46,4 +46,8 @@ export default class BansRepository implements IBanRepository {
 
     return bannedUser;
   }
+
+  async destroy(user: BannedUser): Promise<void> {
+    await this.ormRepository.delete(user);
+  }
 }
