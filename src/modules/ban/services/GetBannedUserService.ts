@@ -1,7 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 
 import IBanRepository from '../repositories/IBanRepository';
-import BannedUser from '../infra/typeorm/schemas/Ban';
+import BannedUser from '../infra/typeorm/schemas/BannedUser';
 import IDiscordUserDTO from '../dtos/IDiscordUserDTO';
 
 @injectable()

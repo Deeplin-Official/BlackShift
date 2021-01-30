@@ -1,7 +1,7 @@
 import { GuildMember, Message } from 'discord.js';
 import { inject, injectable } from 'tsyringe';
 
-import BannedUser from '../infra/typeorm/schemas/Ban';
+import BannedUser from '../infra/typeorm/schemas/BannedUser';
 import IBanRepository from '../repositories/IBanRepository';
 
 interface IResquest {

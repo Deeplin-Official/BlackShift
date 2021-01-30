@@ -6,13 +6,15 @@ import Hello from '@modules/hello/services/SendHelloMessageService';
 import Help from '@modules/help/services/SendHelpMessageService';
 import Ping from '@modules/ping/services/SendPingMessageService';
 import Ban from '@modules/ban/services/SendBanMessageService';
+import Staff from '@modules/staff/services/SendStaffUserMessageService';
 
 export default class RunCommands {
-  execute({ command, message, secondArgument }: IRunCommandsDTO): void {
+  execute({ command, message }: IRunCommandsDTO): void {
     const helloCommand = container.resolve(Hello);
     const helpCommand = container.resolve(Help);
     const pingCommand = container.resolve(Ping);
     const banCommand = container.resolve(Ban);
+    const staffCommand = container.resolve(Staff);
 
     switch (command) {
       case 'hello':
@@ -28,9 +30,15 @@ export default class RunCommands {
         break;
 
       case 'ban':
-        if (!secondArgument) return;
+        banCommand.execute(message);
+        break;
 
-        banCommand.execute(message, secondArgument);
+      case 'addStaff':
+        staffCommand.execute({ message, method: 'add' });
+        break;
+
+      case 'rmStaff':
+        staffCommand.execute({ message, method: 'remove' });
         break;
 
       default:

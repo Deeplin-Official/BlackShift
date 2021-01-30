@@ -39,7 +39,6 @@ export default class App {
         try {
           runCommands.execute({
             command: args[0],
-            secondArgument: args[1],
             message,
           });
         } catch (error) {

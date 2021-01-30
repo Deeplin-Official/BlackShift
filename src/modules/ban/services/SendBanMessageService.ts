@@ -1,7 +1,7 @@
 import { container } from 'tsyringe';
 import { Message } from 'discord.js';
 
-import Ban from '../infra/typeorm/schemas/Ban';
+import BannedUser from '../infra/typeorm/schemas/BannedUser';
 
 import CreateBannedUserService from './CreateBannedUserService';
 import UpdateBannedUserService from './UpdateBannedUserService';
@@ -9,7 +9,7 @@ import GetBannedUserService from './GetBannedUserService';
 import BanUserService from './BanUserService';
 
 export default class SendBanMessageService {
-  async execute(message: Message): Promise<Ban | Message> {
+  async execute(message: Message): Promise<BannedUser | Message> {
     const createBannedUser = container.resolve(CreateBannedUserService);
     const updateBannedUser = container.resolve(UpdateBannedUserService);
     const getBannedUser = container.resolve(GetBannedUserService);

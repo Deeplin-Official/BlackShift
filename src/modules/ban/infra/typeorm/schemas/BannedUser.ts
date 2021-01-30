@@ -9,8 +9,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('bans')
-export default class Ban {
+@Entity('bannedUsers')
+export default class BannedUser {
   @ObjectIdColumn()
   id: ObjectID;
 

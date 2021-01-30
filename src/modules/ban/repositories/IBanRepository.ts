@@ -1,6 +1,6 @@
 import ICreateBanUserDTO from '../dtos/ICreateBanUserDTO';
 import IDiscordUserDTO from '../dtos/IDiscordUserDTO';
-import UserBanned from '../infra/typeorm/schemas/Ban';
+import UserBanned from '../infra/typeorm/schemas/BannedUser';
 
 export default interface IBanRepository {
   create(data: ICreateBanUserDTO): Promise<UserBanned>;

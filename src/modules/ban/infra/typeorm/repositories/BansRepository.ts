@@ -2,7 +2,7 @@ import { getMongoRepository, MongoRepository } from 'typeorm';
 
 import ICreateBanUserDTO from '@modules/ban/dtos/ICreateBanUserDTO';
 import IDiscordUserDTO from '@modules/ban/dtos/IDiscordUserDTO';
-import BannedUser from '../schemas/Ban';
+import BannedUser from '../schemas/BannedUser';
 
 import IBanRepository from '../../../repositories/IBanRepository';
 
