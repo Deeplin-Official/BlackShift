@@ -4,12 +4,16 @@ import 'dotenv/config';
 import { Client as DiscordClient, Message } from 'discord.js';
 import { container } from 'tsyringe';
 
+import databaseConnection from '../typeorm';
+
 import RunCommands from '../commands';
 
-export default class App {
-  discordClient: DiscordClient;
+import '@shared/infra/container';
 
-  prefix: '!';
+export default class App {
+  private discordClient: DiscordClient;
+
+  private prefix: '!';
 
   constructor() {
     this.discordClient = new DiscordClient();
@@ -32,13 +36,22 @@ export default class App {
       if (command !== 'ctos') return;
 
       if (command?.toLocaleLowerCase() === 'ctos') {
-        runCommands.execute({ command: args[0], message });
+        try {
+          runCommands.execute({
+            command: args[0],
+            secondArgument: args[1],
+            message,
+          });
+        } catch (error) {
+          console.log(error);
+        }
       }
     });
   }
 
   async start(): Promise<void> {
     try {
+      await databaseConnection();
       await this.discordClient.login(process.env.BOT_TOKEN);
 
       console.log('🚀️ Successful connection.');
