@@ -37,11 +37,11 @@ export default class RunCommands {
         await banCommand.execute(message);
         break;
 
-      case 'addStaff':
+      case 'createStaff':
         await staffCommand.execute({ message, method: 'add' });
         break;
 
-      case 'rmStaff':
+      case 'removeStaff':
         await staffCommand.execute({ message, method: 'remove' });
         break;
 
