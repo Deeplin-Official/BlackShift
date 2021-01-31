@@ -1,8 +1,15 @@
+import BotMessageService from '@shared/services/BotMessageService';
 import { Message } from 'discord.js';
+import { container } from 'tsyringe';
 
 export default class SendPingMessageService {
-  execute(message: Message): void {
+  async execute(message: Message): Promise<void> {
+    const sendBotMessage = container.resolve(BotMessageService);
+
     const timeTaken = Date.now() - message.createdTimestamp;
-    message.channel.send(`Pong! This message had a latency of ${timeTaken}ms.`);
+    await sendBotMessage.execute({
+      discordMessage: message,
+      message: `Pong! This message had a latency of ${timeTaken}ms.`,
+    });
   }
 }

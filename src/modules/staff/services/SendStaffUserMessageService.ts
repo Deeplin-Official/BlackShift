@@ -1,6 +1,7 @@
 import { container } from 'tsyringe';
 import { Message } from 'discord.js';
 
+import BotMessageService from '@shared/services/BotMessageService';
 import CreateStaffUserService from './CreateStaffUserService';
 import FindStaffUserService from './FindStaffUserService';
 import ICreateStaffUserDTO from '../dtos/ICreateStaffUserDTO';
@@ -23,74 +24,85 @@ interface IRemoveStaffRequest {
 
 export default class SendStaffUserMessageService {
   async execute({ message, method }: IRequest): Promise<void> {
-    try {
-      const findStaff = container.resolve(FindStaffUserService);
+    const findStaff = container.resolve(FindStaffUserService);
+    const sendBotMessage = container.resolve(BotMessageService);
 
-      const { mentions, member } = message;
+    const { mentions, member } = message;
 
-      const userTarget = mentions.users.first();
-      const checkIsStaff = !!member?.roles.cache.find(
-        roleName =>
-          roleName.name === 'Administrator' || roleName.name === 'Moderator',
-      );
+    const userTarget = mentions.users.first();
+    const checkIsStaff = !!member?.roles.cache.find(
+      roleName =>
+        roleName.name === 'Administrator' || roleName.name === 'Moderator',
+    );
 
-      if (!checkIsStaff)
-        throw new Error('⛔️ User not allowed to run this command.');
-
-      if (!userTarget) throw new Error('⛔️ Please insert an user.');
-
-      const foundStaffUser = await findStaff.execute({
-        staffId: userTarget.id,
+    if (!checkIsStaff) {
+      await sendBotMessage.execute({
+        discordMessage: message,
+        message: '⛔️ User not allowed to run this command.',
       });
+      return;
+    }
 
-      const { username, avatar, id } = userTarget;
+    if (!userTarget) {
+      await sendBotMessage.execute({
+        discordMessage: message,
+        message: '⛔️ Please insert an user.',
+      });
+      return;
+    }
 
-      switch (method) {
-        case 'add':
-          if (foundStaffUser) throw new Error('⛔️ Staff already exists.');
+    const foundStaffUser = await findStaff.execute({
+      staffId: userTarget.id,
+    });
 
-          await this.AddStaff({
-            message,
-            staffUser: {
-              staff_id: id,
-              username,
-              avatar: avatar || null,
-            },
+    const { username, avatar, id } = userTarget;
+
+    switch (method) {
+      case 'add':
+        if (foundStaffUser) {
+          await sendBotMessage.execute({
+            discordMessage: message,
+            message: '⛔️ Staff already exists.',
           });
-          break;
+          return;
+        }
 
-        case 'remove':
-          await this.RemoveStaff({ message, staff_id: id });
-          break;
-        default:
-          throw new Error('⛔️ Method does not exists.');
-      }
-    } catch (error) {
-      if (error.message) {
-        message.channel.send(error.message);
-      }
+        await this.AddStaff({
+          staffUser: {
+            staff_id: id,
+            username,
+            avatar: avatar || null,
+          },
+          message,
+        });
+        break;
+
+      case 'remove':
+        await this.RemoveStaff({ staff_id: id, message });
+        break;
+      default:
+        await sendBotMessage.execute({
+          discordMessage: message,
+          message: '⛔️ Method does not exists.',
+        });
     }
   }
 
   private async AddStaff({
-    message,
     staffUser,
+    message,
   }: IAddStaffRequest): Promise<void> {
     const createStaffUser = container.resolve(CreateStaffUserService);
 
-    createStaffUser.execute({ staffUserData: staffUser });
-
-    message.channel.send('✅️ Staff successfully added.');
+    createStaffUser.execute({ staffUserData: staffUser, message });
   }
 
   private async RemoveStaff({
-    message,
     staff_id,
+    message,
   }: IRemoveStaffRequest): Promise<void> {
     const removeStaff = container.resolve(RemoveStaffUserService);
 
-    await removeStaff.execute({ staff_id });
-
-    message.channel.send('✅️ Staff successfully removed.');
+    await removeStaff.execute({ staff_id, message });
   }
 }

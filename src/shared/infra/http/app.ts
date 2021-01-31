@@ -37,7 +37,7 @@ export default class App {
 
       if (command?.toLocaleLowerCase() === 'ctos') {
         try {
-          runCommands.execute({
+          await runCommands.execute({
             command: args[0],
             message,
           });

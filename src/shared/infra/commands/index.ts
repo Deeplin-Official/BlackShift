@@ -8,43 +8,49 @@ import Ping from '@modules/ping/services/SendPingMessageService';
 import Ban from '@modules/ban/services/SendBanMessageService';
 import Staff from '@modules/staff/services/SendStaffUserMessageService';
 
+import BotMessageService from '@shared/services/BotMessageService';
+
 export default class RunCommands {
-  execute({ command, message }: IRunCommandsDTO): void {
+  async execute({ command, message }: IRunCommandsDTO): Promise<void> {
     const helloCommand = container.resolve(Hello);
     const helpCommand = container.resolve(Help);
     const pingCommand = container.resolve(Ping);
     const banCommand = container.resolve(Ban);
     const staffCommand = container.resolve(Staff);
 
+    const sendBotMessage = container.resolve(BotMessageService);
+
     switch (command) {
       case 'hello':
-        helloCommand.execute(message);
+        await helloCommand.execute(message);
         break;
 
       case 'help':
-        helpCommand.execute(message);
+        await helpCommand.execute(message);
         break;
 
       case 'ping':
-        pingCommand.execute(message);
+        await pingCommand.execute(message);
         break;
 
       case 'ban':
-        banCommand.execute(message);
+        await banCommand.execute(message);
         break;
 
       case 'addStaff':
-        staffCommand.execute({ message, method: 'add' });
+        await staffCommand.execute({ message, method: 'add' });
         break;
 
       case 'rmStaff':
-        staffCommand.execute({ message, method: 'remove' });
+        await staffCommand.execute({ message, method: 'remove' });
         break;
 
       default:
-        message.channel.send(
-          "Oooh, i can't understand that command please do 'help' to list all existent commands",
-        );
+        await sendBotMessage.execute({
+          discordMessage: message,
+          message:
+            "Oooh, i can't understand that command please do 'help' to list all existent commands",
+        });
         break;
     }
   }
