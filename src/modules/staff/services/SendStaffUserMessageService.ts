@@ -27,12 +27,16 @@ export default class SendStaffUserMessageService {
     const findStaff = container.resolve(FindStaffUserService);
     const sendBotMessage = container.resolve(BotMessageService);
 
-    const { mentions, member } = message;
+    const { mentions, member, guild } = message;
 
-    const userTarget = mentions.users.first();
+    const targetUser = mentions.users.first();
     const checkIsStaff = !!member?.roles.cache.find(
       roleName =>
         roleName.name === 'Administrator' || roleName.name === 'Moderator',
+    );
+
+    const role = guild?.roles.cache.find(
+      storagedRole => storagedRole.name === 'Moderator',
     );
 
     if (!checkIsStaff) {
@@ -43,19 +47,28 @@ export default class SendStaffUserMessageService {
       return;
     }
 
-    if (!userTarget) {
+    if (!targetUser) {
       await sendBotMessage.execute({
         discordMessage: message,
         message: '⛔️ Please insert an user.',
       });
       return;
     }
+    const { username, avatar, id } = targetUser;
+
+    const userMember = guild?.members.cache.get(id);
+
+    if (!role) {
+      await sendBotMessage.execute({
+        discordMessage: message,
+        message: '⛔️ Please try again later.',
+      });
+      return;
+    }
 
     const foundStaffUser = await findStaff.execute({
-      staffId: userTarget.id,
+      staffId: targetUser.id,
     });
-
-    const { username, avatar, id } = userTarget;
 
     switch (method) {
       case 'add':
@@ -64,6 +77,7 @@ export default class SendStaffUserMessageService {
             discordMessage: message,
             message: '⛔️ Staff already exists.',
           });
+
           return;
         }
 
@@ -75,10 +89,13 @@ export default class SendStaffUserMessageService {
           },
           message,
         });
+
+        await userMember?.roles.add(role);
         break;
 
       case 'remove':
         await this.RemoveStaff({ staff_id: id, message });
+        await userMember?.roles.remove(role);
         break;
       default:
         await sendBotMessage.execute({

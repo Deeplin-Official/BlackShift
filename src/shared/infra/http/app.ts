@@ -33,9 +33,9 @@ export default class App {
 
       const command = args.shift()?.toLowerCase();
 
-      if (command !== 'ctos') return;
+      if (command !== 'rs') return;
 
-      if (command?.toLocaleLowerCase() === 'ctos') {
+      if (command?.toLocaleLowerCase() === 'rs') {
         try {
           await runCommands.execute({
             command: args[0],
