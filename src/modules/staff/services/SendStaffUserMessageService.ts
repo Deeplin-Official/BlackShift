@@ -81,6 +81,7 @@ export default class SendStaffUserMessageService {
           return;
         }
 
+        await userMember?.roles.add(role);
         await this.AddStaff({
           staffUser: {
             staff_id: id,
@@ -90,12 +91,11 @@ export default class SendStaffUserMessageService {
           message,
         });
 
-        await userMember?.roles.add(role);
         break;
 
       case 'remove':
-        await this.RemoveStaff({ staff_id: id, message });
         await userMember?.roles.remove(role);
+        await this.RemoveStaff({ staff_id: id, message });
         break;
       default:
         await sendBotMessage.execute({
