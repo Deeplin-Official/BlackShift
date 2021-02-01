@@ -38,4 +38,4 @@ A Node discord bot created to server management with typescript language.
 - [x] Doten
 - [x] Docker
 
-<b>Created with ❤️ by <a href="https://www.github.com/martins20">Martins20</a></b>
+<b>Created with ❤️ by <a href="https://github.com/Deeplin-Officia">Deeplin</a></b>
