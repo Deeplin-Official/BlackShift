@@ -1,4 +1,4 @@
-# 🤖️ CTOS
+# 🤖️ BlackShift
 
 A Node discord bot created to server management with typescript language.
 
