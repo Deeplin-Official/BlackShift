@@ -17,7 +17,7 @@ export default class App {
 
   constructor() {
     this.discordClient = new DiscordClient();
-    this.prefix = '!';
+    this.prefix = '$';
     this.ListenCommands();
   }
 
@@ -33,9 +33,9 @@ export default class App {
 
       const command = args.shift()?.toLowerCase();
 
-      if (command !== 'rs') return;
+      if (command !== 'bs') return;
 
-      if (command?.toLocaleLowerCase() === 'rs') {
+      if (command?.toLocaleLowerCase() === 'bs') {
         try {
           await runCommands.execute({
             command: args[0],
