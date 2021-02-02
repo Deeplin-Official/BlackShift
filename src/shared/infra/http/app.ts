@@ -13,7 +13,7 @@ import '@shared/infra/container';
 export default class App {
   private discordClient: DiscordClient;
 
-  private prefix: '!';
+  private prefix: '$';
 
   constructor() {
     this.discordClient = new DiscordClient();
